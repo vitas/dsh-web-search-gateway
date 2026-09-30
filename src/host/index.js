@@ -50,31 +50,84 @@ const TEST_SOURCE_LIMIT = 8
 const TEST_QUERY = 'DeepSeek Harness web search plugin'
 
 /**
- * Build the settings schema. Kept in a helper so the schema only exists when
- * schemastery resolves — a bare development checkout without the peer still
- * composes, with the composition entry as the only configuration source.
+ * Build a settings schema, optionally marking every field volatile.
+ *
+ * `.volatile()` is what tells DSH 0.1.7 which fields belong to a row's settings
+ * form: its settings service projects the form from the volatile part of a
+ * Config schema only (`volatileForm` in dsh-settings) and refuses writes that do
+ * not lie beneath a volatile node. A schema with no volatile field is invisible
+ * to the Plugins page — the entry is dropped from `describe`, no namespace is
+ * served, and every user override is silently rejected — which is exactly what
+ * happened to this plugin before the marker was added.
+ *
+ * The marker is NOT free: a volatile field resolves from outside the local
+ * document, so a bare schemastery call such as `schema({})` yields nothing for
+ * it. The imperative `installSection` path below resolves the section that way,
+ * so it keeps the plain schema and both versions behave as they always did.
+ *
+ * @param z - the schemastery module.
+ * @param volatile - mark every field `.volatile()`.
+ * @returns the object schema.
  */
-async function buildSchema() {
-  const { default: z } = await import('@deepseek-ai/schemastery')
+function makeSchema(z, volatile) {
+  /** Apply the volatile marker where the schema type supports it. */
+  const mark = (schema) => (volatile && typeof schema.volatile === 'function' ? schema.volatile() : schema)
   return z.object({
-    protocol: z.union(PROTOCOL_IDS.map((id) => z.const(id))).default('openai'),
-    apiKey: z.string().role('secret'),
-    apiKeyEnv: z.string().role('credential-ref').default(DEFAULT_API_KEY_ENV),
-    baseURL: z.string().default(DEFAULT_BASE_URL),
-    model: z.string().default(DEFAULT_MODEL),
-    maxResults: z.number().step(1).min(1).max(MAX_RESULTS_LIMIT).default(DEFAULT_MAX_RESULTS),
-    maxOutputTokens: z.number().step(1).min(1).default(DEFAULT_MAX_OUTPUT_TOKENS),
-    includeAnswer: z.boolean().default(false),
-    engine: z.string(),
-    searchContextSize: z.string(),
-    maxUses: z.number().step(1).min(1),
-    maxTotalResults: z.number().step(1).min(1),
-    allowedDomains: z.array(z.string()),
-    excludedDomains: z.array(z.string()),
-    referer: z.string(),
-    title: z.string(),
+    protocol: mark(z.union(PROTOCOL_IDS.map((id) => z.const(id))).default('openai')),
+    apiKey: mark(z.string().role('secret')),
+    apiKeyEnv: mark(z.string().role('credential-ref').default(DEFAULT_API_KEY_ENV)),
+    baseURL: mark(z.string().default(DEFAULT_BASE_URL)),
+    model: mark(z.string().default(DEFAULT_MODEL)),
+    maxResults: mark(z.number().step(1).min(1).max(MAX_RESULTS_LIMIT).default(DEFAULT_MAX_RESULTS)),
+    maxOutputTokens: mark(z.number().step(1).min(1).default(DEFAULT_MAX_OUTPUT_TOKENS)),
+    includeAnswer: mark(z.boolean().default(false)),
+    engine: mark(z.string()),
+    searchContextSize: mark(z.string()),
+    maxUses: mark(z.number().step(1).min(1)),
+    maxTotalResults: mark(z.number().step(1).min(1)),
+    allowedDomains: mark(z.array(z.string())),
+    excludedDomains: mark(z.array(z.string())),
+    referer: mark(z.string()),
+    title: mark(z.string()),
   })
 }
+
+/**
+ * The two schemas, built once. Absent when schemastery does not resolve — a
+ * bare development checkout without the peer still composes, with the
+ * composition entry as the only configuration source.
+ *
+ * @returns `{ settings, config }`: the plain schema the imperative path
+ *   registers, and the volatile one the loader exposes as Config.
+ */
+async function buildSchemas() {
+  try {
+    const { default: z } = await import('@deepseek-ai/schemastery')
+    return { settings: makeSchema(z, false), config: makeSchema(z, true) }
+  } catch {
+    return { settings: undefined, config: undefined }
+  }
+}
+
+/**
+ * The row's Config schema, which the loader applies to `config` before `apply`.
+ *
+ * DSH 0.1.7 dropped `ctx.settings.installSection` and made a plugin's settings
+ * section the Config of its own Loader row: the loader validates the row's
+ * configuration against this export, and the settings service projects it into
+ * a form the Plugins page renders. Without it a row has no schema, so the
+ * settings service has no section for it and every user override is rejected —
+ * the plugin silently keeps the composition entry's values.
+ *
+ * 0.1.5 has no such convention, so `apply` below still registers the same
+ * fields imperatively and both versions stay configured. Cordis treats a
+ * missing Config as "no schema", so the peer-less checkout composes exactly as
+ * it did before.
+ */
+const SCHEMAS = await buildSchemas()
+
+/** The volatile schema the loader exposes as this row's Config. */
+export const Config = SCHEMAS.config
 
 /** Write one JSON response with no caching. */
 function sendJson(res, status, payload) {
@@ -104,26 +157,65 @@ async function readJsonBody(req) {
  * Plugin entry.
  *
  * @param ctx - host cordis context.
- * @param config - the composition entry's config (the settings base layer).
+ * @param config - the row's config, already resolved by the loader against
+ *   {@link Config} (the composition entry, overlaid with the settings layer on
+ *   0.1.5).
+ */
+/**
+ * Read one resolved config field.
+ *
+ * DSH 0.1.7 hands a volatile field over as a live accessor rather than a value —
+ * the shipped providers read `config.model.get()`. Reading that accessor as a
+ * scalar yields the accessor object itself, which then looks like an absent
+ * field, so every row silently falls back to the schema defaults and the user's
+ * own configuration never reaches the search. 0.1.5 hands over plain values, so
+ * this is a no-op there. Reading through the accessor on every call is also what
+ * makes a settings edit reach the next search without a restart.
+ *
+ * @param value - one field of the loader-resolved config.
+ * @returns the current value behind it.
+ */
+function readField(value) {
+  return value !== null && typeof value === 'object' && typeof value.get === 'function' ? value.get() : value
+}
+
+/** Project a whole resolved config through {@link readField}. */
+function readConfig(config) {
+  if (config === null || typeof config !== 'object') return {}
+  return Object.fromEntries(Object.entries(config).map(([key, value]) => [key, readField(value)]))
+}
+
+/**
+ * Register the search provider and the two loopback routes the card uses.
+ *
+ * @param ctx - the plugin context.
+ * @param config - the row's config, already resolved by the loader against
+ *   {@link Config}.
  */
 export async function apply(ctx, config = {}) {
-  /** Effective configuration: composition entry until the settings service attaches. */
-  let current = () => config
+  /** Effective configuration, read fresh so live settings edits apply. */
+  let current = () => readConfig(config)
 
-  try {
-    const schema = await buildSchema()
-    ctx.inject(['settings'], (settingsCtx) => {
-      settingsCtx.settings.installSection(ctx, SETTINGS_NAMESPACE, schema, config, {
+  ctx.inject(['settings'], (settingsCtx) => {
+    // DSH 0.1.7 replaced this seam: a plugin's settings section is now its own
+    // Loader row's Config, which the loader applied to `config` before this
+    // call, and which `mutate` writes back into the profile patch — a write the
+    // loader answers by re-applying the row. Registering here would be wrong
+    // rather than redundant, so the missing method is the signal to stop.
+    if (typeof settingsCtx.settings.installSection !== 'function') return
+    if (SCHEMAS.settings === undefined) return
+    try {
+      settingsCtx.settings.installSection(ctx, SETTINGS_NAMESPACE, SCHEMAS.settings, config, {
         setSource: (source) => {
-          current = source
+          current = () => readConfig(source())
         },
         onChange: () => {},
       })
-    })
-  } catch {
-    // schemastery or the settings seam unavailable — the composition entry stays
-    // authoritative and every other surface keeps working.
-  }
+    } catch {
+      // The composition entry stays authoritative and every other surface keeps
+      // working — a settings registration must never take the provider down.
+    }
+  })
 
   const provider = new OpenRouterSearchProvider(() => {
     const options = resolveOptions(ctx, current())

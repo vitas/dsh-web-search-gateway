@@ -10,6 +10,10 @@
 export const en = {
   title: 'Web search (OpenRouter)',
   subtitle: 'Runs the built-in web_search tool on your OpenRouter-compatible gateway — same endpoint and key as your chat models.',
+  // Row one-liner on the DSH 0.1.7 plugin manager page, shown when the row
+  // carries no description of its own. Shorter than `subtitle` on purpose: it
+  // sits in a detail page's description slot, not under a card title.
+  summary: 'Runs web_search on your own OpenRouter-compatible gateway — same endpoint and key as your chat models.',
   loading: 'Loading…',
   unavailable: 'This composition does not expose the settings namespace. Configuration stays in the profile patch.',
   overridden: 'overridden',
@@ -65,6 +69,7 @@ export const en = {
 export const zh = {
   title: '网页搜索（OpenRouter）',
   subtitle: '让内置的 web_search 工具走你的 OpenRouter 兼容网关——与对话模型共用同一个端点和密钥。',
+  summary: '让 web_search 走你自己的 OpenRouter 兼容网关——与对话模型共用同一个端点和密钥。',
   loading: '加载中…',
   unavailable: '当前组合未暴露设置命名空间，配置仍以 profile 补丁为准。',
   overridden: '已覆盖',
@@ -120,6 +125,7 @@ export const zh = {
 export const ru = {
   title: 'Веб-поиск (OpenRouter)',
   subtitle: 'Встроенный инструмент web_search работает через ваш OpenRouter-совместимый шлюз — тот же endpoint и ключ, что у чат-моделей.',
+  summary: 'Инструмент web_search работает через ваш OpenRouter-совместимый шлюз — тот же endpoint и ключ, что у чат-моделей.',
   loading: 'Загрузка…',
   unavailable: 'В этой сборке нет пространства настроек. Конфигурация остаётся в патче профиля.',
   overridden: 'переопределено',

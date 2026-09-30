@@ -378,8 +378,15 @@ function TestPanel(props: { disabled: boolean }) {
   )
 }
 
-/** Top-level card. Renders `null` while the namespace is not exposed. */
-export function WebSearchSettingsCard(props: { scope: WebSearchScope }) {
+/**
+ * Top-level card.
+ *
+ * Renders the namespace's status line while it has no values to edit. `heading`
+ * draws the card's own title and subtitle; the DSH 0.1.7 plugin manager page
+ * supplies both itself around the row's form, so the registration there passes
+ * `heading: false` rather than printing the title twice.
+ */
+export function WebSearchSettingsCard(props: { scope: WebSearchScope; heading?: boolean }) {
   const snapshot = useScopeSnapshot(props.scope)
   // Re-render on active-language change; `tr` reads the translator at render time.
   useSyncExternalStore(subscribeLocale, localeRevision, localeRevision)
@@ -402,8 +409,12 @@ export function WebSearchSettingsCard(props: { scope: WebSearchScope }) {
 
   return (
     <div>
-      <div style={{ fontSize: 13, fontWeight: 600 }}>{tr('title')}</div>
-      <div style={{ ...hintStyle, marginBottom: 12 }}>{tr('subtitle')}</div>
+      {props.heading === false ? null : (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>{tr('title')}</div>
+          <div style={{ ...hintStyle, marginBottom: 12 }}>{tr('subtitle')}</div>
+        </>
+      )}
 
       <SelectField
         id="web-search-openrouter-protocol"

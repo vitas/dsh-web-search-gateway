@@ -4,6 +4,38 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-09-30
+
+Supports both settings models: DSH 0.1.7 (Plugins row pages) and DSH 0.1.5
+(the `web-search-openrouter` page under Settings). No configuration change is
+needed on either version — the same `cordis.patch.yml` entry keeps working.
+
+### Added
+
+- Row-configuration page for DSH 0.1.7, which replaced `settings.plugin.item`
+  with the keyed `plugins.row.config` slot. A row's own `Config` is its settings
+  section there, so the form is registered against
+  `web-search-openrouter#web-search-openrouter`.
+- `summary` locale key (en/zh/ru) for the row description DSH 0.1.7 renders
+  where the package carries none.
+
+### Fixed
+
+- **DSH 0.1.7: the settings form is reachable again.** The entry was missing
+  from the Plugins page entirely — no Configure control and no namespace — and
+  it is the *volatile* part of a `Config` schema that 0.1.7 projects a form
+  from. Every field is now marked `.volatile()`, which is inert on 0.1.5, whose
+  `schemastery` (3.18.2) has no such method.
+- **DSH 0.1.7: the configured endpoint and model reach the search again.** 0.1.7
+  hands each volatile field to `apply` as a live accessor (`config.model.get()`)
+  rather than a value. Read as a scalar it looks like an absent field, so every
+  row silently fell back to the schema defaults and searches went to
+  `openrouter.ai` whatever the patch said. Values are read through the accessor
+  now, which also makes a settings edit reach the next search without a restart.
+- DSH 0.1.7 removed `ctx.settings.installSection` and `ctx.settingsScope`. The
+  imperative registration is guarded on the method being present, so it is
+  skipped rather than throwing where the seam is gone.
+
 ## [1.0.0] — 2025-09-24
 
 First public release. Published to npm as
@@ -39,4 +71,5 @@ First public release. Published to npm as
 - GitHub Actions CI: host syntax check, client typecheck, locale parity, unit
   tests, committed-bundle freshness, and `npm pack` inspection.
 
+[1.1.0]: https://github.com/vitas/dsh-web-search-openrouter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/vitas/dsh-web-search-openrouter/releases/tag/v1.0.0

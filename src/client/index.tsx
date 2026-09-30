@@ -1,12 +1,23 @@
 /**
  * `@samebits/dsh-web-search-openrouter` — browser half.
  *
- * Claims the `web-search-openrouter` namespace on the Plugins settings tab
- * through the keyed `settings.plugin.item` slot, so the card is exactly the one
- * the host half registered a schema for. Uses only cordis client context
- * services (`slots`, `locale`, `settingsScope`) and its own components — no
- * value imports from other DSH client packages (bundle-purity rule). Without
- * the settings UI the fiber simply never fires and nothing throws.
+ * Registers the `web-search-openrouter` configuration card on whichever Plugins
+ * surface the running client offers, without a version check:
+ *
+ * - DSH 0.1.7+ moved Plugins to a sidebar page (`dsh-client-ui-plugin-manager`)
+ *   and keys row configuration by `<package name>#<row id>` on the
+ *   `plugins.row.config` slot. The page owns the row's form, and
+ *   `ctx.configForms.get(NS)` is the scope the card binds — deliberately the
+ *   same `getSnapshot`/`subscribe`/`set`/`unset` shape the old settings scope
+ *   had, so the card itself did not have to change with the seam.
+ * - DSH 0.1.5 keeps the Plugins settings tab and the `settings.plugin.item`
+ *   slot, bound through `ctx.settingsScope.bind({ namespace })`.
+ *
+ * Each surface is registered through its own `ctx.inject`, so a fiber fires
+ * only where its service exists: 0.1.7 has no `settingsScope` and 0.1.5 has no
+ * `configForms`. Uses only cordis client context services and its own
+ * components — no value imports from other DSH client packages (bundle-purity
+ * rule). Where neither seam exists the fibers never fire and nothing throws.
  *
  * Localization: registers en/zh dictionaries (the locales DSH ships) plus a
  * Russian language pack — `addLanguage({ id: 'ru' })` makes Russian selectable
@@ -15,13 +26,12 @@
  */
 import * as React from 'react'
 import { WebSearchSettingsCard } from './SettingsCard.js'
-import { bindTranslator, notifyLocale } from './i18n.js'
+import { bindTranslator, notifyLocale, tr } from './i18n.js'
 import { en, zh, ru } from './locales.js'
+import { ROW_CONFIG_KEY, SETTINGS_NAMESPACE as NS } from '../shared/config.mjs'
 
 export const name = 'dsh-web-search-openrouter'
 export const inject = ['slots', 'locale']
-
-const NS = 'web-search-openrouter'
 
 /** Register the copy dictionaries and bind the translator. */
 function wireLocale(ctx: any): void {
@@ -42,8 +52,48 @@ function wireLocale(ctx: any): void {
   }
 }
 
-export function apply(ctx: any) {
-  wireLocale(ctx)
+/**
+ * DSH 0.1.7+ — the plugin manager page asks for this row's configuration.
+ *
+ * `view: 'summary'` is the row's one-liner, shown when the package carries no
+ * description of its own; `view: 'page'` is the form. The page draws the title,
+ * icon, and crumb around that form, so the card drops its own heading here.
+ *
+ * @param ctx - the browser plugin context.
+ */
+function registerRowConfig(ctx: any): void {
+  ctx.inject(['configForms'], (c: any) => {
+    try {
+      const card = (props: { view?: string }) =>
+        props?.view === 'summary'
+          ? React.createElement('span', null, tr('summary'))
+          : React.createElement(WebSearchSettingsCard, { scope: c.configForms.get(NS), heading: false })
+
+      const register = () =>
+        c.slots.inject('plugins.row.config', () =>
+          c.slots.register({ name: 'plugins.row.config', key: ROW_CONFIG_KEY, locale: NS }, card),
+        )
+
+      // `whileServed` keeps the registration alive only while the Host actually
+      // serves our namespace, so a deployment that never composed us shows no
+      // trace of the entry.
+      if (typeof c.configForms?.whileServed === 'function') {
+        c.effect(() => c.configForms.whileServed([NS], register), 'web-search-openrouter: row configuration page')
+      } else {
+        register()
+      }
+    } catch {
+      // A slot anomaly must never break the Plugins page itself.
+    }
+  })
+}
+
+/**
+ * DSH 0.1.5 — the Plugins settings tab, keyed by the settings namespace.
+ *
+ * @param ctx - the browser plugin context.
+ */
+function registerSettingsItem(ctx: any): void {
   ctx.inject(['settingsScope'], (c: any) => {
     try {
       const scope = c.settingsScope.bind({ namespace: NS })
@@ -56,4 +106,10 @@ export function apply(ctx: any) {
       // Binding anomalies must never break the settings page itself.
     }
   })
+}
+
+export function apply(ctx: any) {
+  wireLocale(ctx)
+  registerRowConfig(ctx)
+  registerSettingsItem(ctx)
 }

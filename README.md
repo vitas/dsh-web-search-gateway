@@ -141,8 +141,11 @@ excerpt.
 ## Settings
 
 Every field is editable from the card and can be seeded from the composition
-entry; anything set in `settings.yaml` is marked *overridden* and can be reset
-there.
+entry. Where the card lives depends on your harness version: DSH 0.1.7 puts it
+on the row's own page under **Plugins** (the sidebar entry), DSH 0.1.5 under
+**Settings → web-search-openrouter**. Edits land in the profile's patch, or in
+`settings.yaml` on 0.1.5. A value that overrides the composition entry is marked
+*overridden* and can be reset from the card.
 
 | Field | Default | Meaning |
 |---|---|---|

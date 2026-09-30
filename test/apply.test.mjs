@@ -110,6 +110,23 @@ test('the installed schema supplies the documented defaults', async () => {
   assert.equal(resolved.includeAnswer, false)
 })
 
+test('a 0.1.7 volatile accessor is unwrapped, not read as a field', async () => {
+  const { ctx, record } = makeCtx()
+  // DSH 0.1.7 hands every volatile field over as a live accessor instead of a
+  // value. Reading one as a scalar yields the accessor object, which then reads
+  // as an absent field, so the row silently falls back to the schema defaults
+  // and the user's own endpoint and model never reach the search.
+  await apply(ctx, {
+    baseURL: { get: () => 'https://api.b.ai/v1' },
+    model: { get: () => 'gpt-5.4-nano' },
+    maxResults: { get: () => 7 },
+  })
+  const options = record.providers[0].resolveOptions()
+  assert.equal(options.baseURL, 'https://api.b.ai/v1')
+  assert.equal(options.model, 'gpt-5.4-nano')
+  assert.equal(options.maxResults, 7)
+})
+
 test('the settings section forwards live edits through setSource', async () => {
   const { ctx, record } = makeCtx()
   await apply(ctx, { model: 'composed' })

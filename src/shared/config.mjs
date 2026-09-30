@@ -21,6 +21,19 @@ export const SETTINGS_NAMESPACE = 'web-search-openrouter'
 /** Cordis plugin name used by loader diagnostics. */
 export const PLUGIN_NAME = 'web-search-openrouter'
 
+/** npm package name this plugin ships as. */
+export const PACKAGE_NAME = '@samebits/dsh-web-search-openrouter'
+
+/**
+ * Key the browser half registers the row's configuration page under.
+ *
+ * DSH 0.1.7 keys `plugins.row.config` by `<package name>#<row id>`, and this
+ * plugin's row id is its cordis plugin name. 0.1.5 keys the old
+ * `settings.plugin.item` by the settings namespace instead; both are derived
+ * here so the two halves cannot disagree about which entry they own.
+ */
+export const ROW_CONFIG_KEY = `${PACKAGE_NAME}#${PLUGIN_NAME}`
+
 /** Canonical OpenRouter Responses base; `/responses` is appended. */
 export const DEFAULT_BASE_URL = 'https://openrouter.ai/api/v1'
 
@@ -43,7 +56,7 @@ export const DEFAULT_MAX_RESULTS = 5
 export const DEFAULT_MAX_OUTPUT_TOKENS = 1024
 
 /** Attribution header sent on every request. Bump with the package version. */
-export const USER_AGENT = 'dsh-web-search-openrouter/1.0.0'
+export const USER_AGENT = 'dsh-web-search-openrouter/1.1.0'
 
 /**
  * Request shapes this provider speaks. Each one reaches a gateway's server-side
