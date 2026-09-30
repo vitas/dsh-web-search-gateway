@@ -28,7 +28,7 @@ import * as React from 'react'
 import { WebSearchSettingsCard } from './SettingsCard.js'
 import { bindTranslator, notifyLocale, tr } from './i18n.js'
 import { en, zh, ru } from './locales.js'
-import { ROW_CONFIG_KEY, SETTINGS_NAMESPACE as NS } from '../shared/config.mjs'
+import { PACKAGE_NAME, ROW_CONFIG_KEY, SETTINGS_NAMESPACE as NS } from '../shared/config.mjs'
 
 export const name = 'dsh-web-search-openrouter'
 export const inject = ['slots', 'locale']
@@ -53,7 +53,18 @@ function wireLocale(ctx: any): void {
 }
 
 /**
- * DSH 0.1.7+ — the plugin manager page asks for this row's configuration.
+ * DSH 0.1.7+ — the settings form on the plugin manager page.
+ *
+ * There are two keyed slots for it, and the choice decides how many clicks the
+ * form is worth. `plugins.bundle.config`, keyed by package name, is what the
+ * shipped bundles use: the page draws the section itself and the form is there the
+ * moment the plugin page opens. `plugins.row.config`, keyed `<package>#<row id>`,
+ * instead files the form on the row's own page, one click away behind a Configure
+ * control in Components — correct, but not what anyone expects next to a shipped
+ * plugin.
+ *
+ * So we register the package slot as the primary surface and keep the row slot for
+ * 0.1.7, which knows only that one.
  *
  * `view: 'summary'` is the row's one-liner, shown when the package carries no
  * description of its own; `view: 'page'` is the form. The page draws the title,
@@ -63,22 +74,36 @@ function wireLocale(ctx: any): void {
  */
 function registerRowConfig(ctx: any): void {
   ctx.inject(['configForms'], (c: any) => {
-    try {
-      const card = (props: { view?: string }) =>
-        props?.view === 'summary'
-          ? React.createElement('span', null, tr('summary'))
-          : React.createElement(WebSearchSettingsCard, { scope: c.configForms.get(NS), heading: false })
+    const card = (props: { view?: string }) =>
+      props?.view === 'summary'
+        ? React.createElement('span', null, tr('summary'))
+        : React.createElement(WebSearchSettingsCard, { scope: c.configForms.get(NS), heading: false })
 
-      const register = () =>
+    // Each surface is guarded on its own, so a loader that predates the package
+    // slot still gets the row page instead of losing the form entirely.
+    const register = () => {
+      try {
+        c.slots.inject('plugins.bundle.config', () =>
+          c.slots.register({ name: 'plugins.bundle.config', key: PACKAGE_NAME, locale: NS }, card),
+        )
+      } catch {
+        // 0.1.7 declares no package-page slot; the row page below is the surface.
+      }
+      try {
         c.slots.inject('plugins.row.config', () =>
           c.slots.register({ name: 'plugins.row.config', key: ROW_CONFIG_KEY, locale: NS }, card),
         )
+      } catch {
+        // A slot anomaly must never break the Plugins page itself.
+      }
+    }
 
+    try {
       // `whileServed` keeps the registration alive only while the Host actually
       // serves our namespace, so a deployment that never composed us shows no
       // trace of the entry.
       if (typeof c.configForms?.whileServed === 'function') {
-        c.effect(() => c.configForms.whileServed([NS], register), 'web-search-openrouter: row configuration page')
+        c.effect(() => c.configForms.whileServed([NS], register), 'web-search-openrouter: settings page')
       } else {
         register()
       }

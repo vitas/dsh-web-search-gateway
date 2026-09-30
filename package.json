@@ -1,6 +1,6 @@
 {
   "name": "@samebits/dsh-web-search-openrouter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Grounded web search for DeepSeek Harness through OpenRouter-compatible gateways: the built-in web_search tool runs on the same endpoint and key as your chat models, returns citeable sources, and is configurable from the Plugins settings page.",
   "type": "module",
   "license": "Apache-2.0",

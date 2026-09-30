@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-09-30
+
+The settings form now sits on the plugin's own page, the way the shipped plugins
+do it: opening Plugins → `@samebits/dsh-web-search-openrouter` shows the fields
+immediately. Previously the form lived on the row's own page, one click further
+in behind a **Configure** control that nothing in the list announced.
+
+### Changed
+
+- Register the form in `plugins.bundle.config`, keyed by package name, the slot
+  the plugin manager draws inline on the package page. `plugins.row.config` is
+  kept alongside it, so DSH 0.1.7 — which knows only that slot — still gets a
+  form rather than none.
+
 ## [1.1.0] — 2026-09-30
 
 Supports both settings models: DSH 0.1.7 (Plugins row pages) and DSH 0.1.5
