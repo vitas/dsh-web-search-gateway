@@ -10,7 +10,7 @@
  * read through `ctx.credentials` (the store the DSH Models page writes) and
  * finally from the launching process environment.
  *
- * @module dsh-web-search-openrouter/host/provider
+ * @module dsh-web-search-gateway/host/provider
  */
 
 import {

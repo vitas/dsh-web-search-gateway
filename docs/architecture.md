@@ -1,6 +1,6 @@
 # Architecture
 
-`@samebits/dsh-web-search-openrouter` is a two-half DSH plugin: a host module that
+`dsh-web-search-gateway` is a two-half DSH plugin: a host module that
 serves the `ctx.web` search seam, and a browser module that renders one settings
 card. There is no service of its own, no background work, and no state.
 

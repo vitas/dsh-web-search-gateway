@@ -1,9 +1,9 @@
-# dsh-web-search-openrouter
+# dsh-web-search-gateway
 
 **Grounded web search for DeepSeek Harness, on the gateway you already pay for.**
 
-[![CI](https://github.com/vitas/dsh-web-search-openrouter/actions/workflows/ci.yml/badge.svg)](https://github.com/vitas/dsh-web-search-openrouter/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@samebits/dsh-web-search-openrouter.svg)](https://www.npmjs.com/package/@samebits/dsh-web-search-openrouter)
+[![CI](https://github.com/vitas/dsh-web-search-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/vitas/dsh-web-search-gateway/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/dsh-web-search-gateway.svg)](https://www.npmjs.com/package/dsh-web-search-gateway)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](./package.json)
 
@@ -40,7 +40,7 @@ citeable results. Only the engine behind it moves.
 ## Install
 
 ```sh
-dsh plugin add @samebits/dsh-web-search-openrouter --profile web
+dsh plugin add dsh-web-search-gateway --profile web
 dsh credential set OPENROUTER_API_KEY   # or export it before launching dsh
 ```
 
@@ -54,10 +54,10 @@ read at boot, so restart `dsh web` once after installing.
 <summary>GitHub or local checkout instead of npm</summary>
 
 ```sh
-dsh plugin add github:vitas/dsh-web-search-openrouter --profile web
+dsh plugin add github:vitas/dsh-web-search-gateway --profile web
 
-git clone https://github.com/vitas/dsh-web-search-openrouter.git
-cd dsh-web-search-openrouter && npm install && npm run build
+git clone https://github.com/vitas/dsh-web-search-gateway.git
+cd dsh-web-search-gateway && npm install && npm run build
 dsh plugin add link:$PWD --profile web
 ```
 </details>

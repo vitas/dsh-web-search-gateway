@@ -4,10 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] — 2026-10-01
+
+**Renamed** from `@samebits/dsh-web-search-openrouter` to `dsh-web-search-gateway`,
+and the repository moved to `vitas/dsh-web-search-gateway` with it. The plain npm
+name `dsh-web-search-openrouter` was already taken by another package, which is
+why the earlier releases lived under a scope — and a scoped name is exactly what
+nobody finds when they search for a web-search plugin. The package name, the
+repository and the install command all changed; the plugin row id
+`web-search-openrouter` did not, so existing configuration keeps working.
+
 ## [1.2.0] — 2026-09-30
 
 The settings form now sits on the plugin's own page, the way the shipped plugins
-do it: opening Plugins → `@samebits/dsh-web-search-openrouter` shows the fields
+do it: opening Plugins → `dsh-web-search-gateway` shows the fields
 immediately. Previously the form lived on the row's own page, one click further
 in behind a **Configure** control that nothing in the list announced.
 
@@ -53,7 +63,7 @@ needed on either version — the same `cordis.patch.yml` entry keeps working.
 ## [1.0.0] — 2025-09-24
 
 First public release. Published to npm as
-[`@samebits/dsh-web-search-openrouter`](https://www.npmjs.com/package/@samebits/dsh-web-search-openrouter).
+[`dsh-web-search-gateway`](https://www.npmjs.com/package/dsh-web-search-gateway).
 
 ### Added
 
@@ -85,5 +95,5 @@ First public release. Published to npm as
 - GitHub Actions CI: host syntax check, client typecheck, locale parity, unit
   tests, committed-bundle freshness, and `npm pack` inspection.
 
-[1.1.0]: https://github.com/vitas/dsh-web-search-openrouter/releases/tag/v1.1.0
-[1.0.0]: https://github.com/vitas/dsh-web-search-openrouter/releases/tag/v1.0.0
+[1.1.0]: https://github.com/vitas/dsh-web-search-gateway/releases/tag/v1.1.0
+[1.0.0]: https://github.com/vitas/dsh-web-search-gateway/releases/tag/v1.0.0

@@ -1,5 +1,5 @@
 /**
- * `@samebits/dsh-web-search-openrouter` — browser half.
+ * `dsh-web-search-gateway` — browser half.
  *
  * Registers the `web-search-openrouter` configuration card on whichever Plugins
  * surface the running client offers, without a version check:
@@ -30,7 +30,7 @@ import { bindTranslator, notifyLocale, tr } from './i18n.js'
 import { en, zh, ru } from './locales.js'
 import { PACKAGE_NAME, ROW_CONFIG_KEY, SETTINGS_NAMESPACE as NS } from '../shared/config.mjs'
 
-export const name = 'dsh-web-search-openrouter'
+export const name = 'dsh-web-search-gateway'
 export const inject = ['slots', 'locale']
 
 /** Register the copy dictionaries and bind the translator. */

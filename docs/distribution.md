@@ -40,8 +40,8 @@ The package therefore declares **no install-time script**. That is deliberate:
 
 | Path | Command | Notes |
 |---|---|---|
-| GitHub | `dsh plugin add github:vitas/dsh-web-search-openrouter --profile web` | Tracks the default branch. Applies the same bundle patch at the next boot; no install-time script, so no pnpm allowlist entry is needed. |
-| Registry (recommended) | `dsh plugin add @samebits/dsh-web-search-openrouter --profile web` | Published; same bundle patch. |
+| GitHub | `dsh plugin add github:vitas/dsh-web-search-gateway --profile web` | Tracks the default branch. Applies the same bundle patch at the next boot; no install-time script, so no pnpm allowlist entry is needed. |
+| Registry (recommended) | `dsh plugin add dsh-web-search-gateway --profile web` | Published; same bundle patch. |
 | Linked checkout | `dsh plugin add link:$PWD --profile web` | Run `npm install && npm run build` first. |
 
 Both paths compose the web seam and the provider row from
@@ -66,7 +66,7 @@ The bundle patch is equivalent to:
 
 - insert:
     - id: web-search-openrouter
-      name: '@samebits/dsh-web-search-openrouter'
+      name: 'dsh-web-search-gateway'
       config:
         protocol: openai
         apiKeyEnv: OPENROUTER_API_KEY

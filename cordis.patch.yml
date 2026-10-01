@@ -1,4 +1,4 @@
-# Bundle-layer patch for @samebits/dsh-web-search-openrouter.
+# Bundle-layer patch for dsh-web-search-gateway.
 #
 # Applied by the loader when this package is listed in `dsh.profile.bundles`
 # (or added with `dsh plugin add`), BEFORE the profile's own
@@ -17,7 +17,7 @@
 
 - insert:
     - id: web-search-openrouter
-      name: '@samebits/dsh-web-search-openrouter'
+      name: 'dsh-web-search-gateway'
       config:
         # Native OpenAI `web_search` tool — what OpenAI, Azure, and
         # OpenRouter-compatible gateways that proxy the native tool accept.

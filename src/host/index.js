@@ -1,5 +1,5 @@
 /**
- * `dsh-web-search-openrouter` — host half.
+ * `dsh-web-search-gateway` — host half.
  *
  * Registers a `ctx.web` search provider that runs the harness's built-in
  * `web_search` tool through an OpenRouter-compatible gateway, using the same
@@ -10,7 +10,7 @@
  * No server of its own, no telemetry: the only outbound traffic is the search
  * request itself, to the endpoint the user configured.
  *
- * @module dsh-web-search-openrouter/host
+ * @module dsh-web-search-gateway/host
  */
 
 import {

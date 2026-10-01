@@ -1,6 +1,6 @@
 {
-  "name": "@samebits/dsh-web-search-openrouter",
-  "version": "1.2.0",
+  "name": "dsh-web-search-gateway",
+  "version": "1.3.0",
   "description": "Grounded web search for DeepSeek Harness through OpenRouter-compatible gateways: the built-in web_search tool runs on the same endpoint and key as your chat models, returns citeable sources, and is configurable from the Plugins settings page.",
   "type": "module",
   "license": "Apache-2.0",
@@ -63,12 +63,12 @@
   "author": "Vitali Ryumshin",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vitas/dsh-web-search-openrouter.git"
+    "url": "git+https://github.com/vitas/dsh-web-search-gateway.git"
   },
   "bugs": {
-    "url": "https://github.com/vitas/dsh-web-search-openrouter/issues"
+    "url": "https://github.com/vitas/dsh-web-search-gateway/issues"
   },
-  "homepage": "https://github.com/vitas/dsh-web-search-openrouter#readme",
+  "homepage": "https://github.com/vitas/dsh-web-search-gateway#readme",
   "engines": {
     "node": ">=20"
   },

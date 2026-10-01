@@ -12,7 +12,7 @@
  *
  * Pure functions; unit-tested in `test/protocol.test.mjs`.
  *
- * @module dsh-web-search-openrouter/host/protocol
+ * @module dsh-web-search-gateway/host/protocol
  */
 
 import { protocolSpec } from '../shared/config.mjs'

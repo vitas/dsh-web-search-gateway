@@ -15,7 +15,7 @@
  * Pure functions only; no network, no configuration. Unit-tested in
  * `test/parse.test.mjs`.
  *
- * @module dsh-web-search-openrouter/host/parse
+ * @module dsh-web-search-gateway/host/parse
  */
 
 /** Non-empty string check, inlined to keep this module dependency-free. */

@@ -9,7 +9,7 @@
  * Dependency-free and side-effect-free on purpose: the host imports it with a
  * plain `import`, and esbuild inlines it into the browser bundle.
  *
- * @module dsh-web-search-openrouter/config
+ * @module dsh-web-search-gateway/config
  */
 
 /** Stable provider id this plugin registers with `ctx.web`. */
@@ -22,7 +22,7 @@ export const SETTINGS_NAMESPACE = 'web-search-openrouter'
 export const PLUGIN_NAME = 'web-search-openrouter'
 
 /** npm package name this plugin ships as. */
-export const PACKAGE_NAME = '@samebits/dsh-web-search-openrouter'
+export const PACKAGE_NAME = 'dsh-web-search-gateway'
 
 /**
  * Key the browser half registers the row's configuration page under.
@@ -56,7 +56,7 @@ export const DEFAULT_MAX_RESULTS = 5
 export const DEFAULT_MAX_OUTPUT_TOKENS = 1024
 
 /** Attribution header sent on every request. Bump with the package version. */
-export const USER_AGENT = 'dsh-web-search-openrouter/1.1.0'
+export const USER_AGENT = 'dsh-web-search-gateway/1.1.0'
 
 /**
  * Request shapes this provider speaks. Each one reaches a gateway's server-side

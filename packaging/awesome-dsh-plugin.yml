@@ -1,6 +1,6 @@
 # Ready-to-submit entry for https://github.com/awesome-dsh-plugin/awesome-dsh-plugin
 # The list lives in data/plugins/, one file per plugin. Submit as:
-#   data/plugins/vitas__dsh-web-search-openrouter.yml
+#   data/plugins/vitas__dsh-web-search-gateway.yml
 # (READMEs in that repo are generated from data/plugins/*.yml — do not edit them.)
 #
 # Requirements met: package.json declares dsh.bundle.patch and ships
@@ -9,8 +9,8 @@
 # (MIN_AGE_DAYS = 1 in scripts/check-submission.mjs); the submission gate
 # re-runs automatically every six hours, so an under-age PR goes green on its
 # own once the repository crosses the bar.
-url: https://github.com/vitas/dsh-web-search-openrouter
-name: vitas/dsh-web-search-openrouter
+url: https://github.com/vitas/dsh-web-search-gateway
+name: vitas/dsh-web-search-gateway
 category: browser
 description:
   en: 'Runs the built-in web_search tool server-side on an OpenRouter-compatible gateway, so search uses the same endpoint and key as the chat models: three request protocols, every citation shape parsed (including snippets recovered from the cited span), and a settings card with a live connection test.'
